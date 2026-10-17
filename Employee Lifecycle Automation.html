@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Employee Lifecycle Automation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f5f4;--surface:#fff;--ink:#14231f;--mute:#5d6e68;--line:#dce3e0;--accent:#0b6b5c;--accent-ink:#fff;--ok:#1d7a46;--okbg:#e2f3e8;--warn:#9a5b00;--warnbg:#fdf0d5;--bad:#b3261e;--badbg:#fbe4e2;--pend:#44546a;--pendbg:#e6ebf2;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1816;--surface:#18231f;--ink:#e6efec;--mute:#9bb0a9;--line:#2a3a35;--accent:#3fc2a9;--accent-ink:#06211c;--ok:#6fd99a;--okbg:#17372a;--warn:#f0b958;--warnbg:#3a2f14;--bad:#ff8a80;--badbg:#401c19;--pend:#a9b9d1;--pendbg:#222e3f}}
+:root[data-theme="dark"]{--bg:#0f1816;--surface:#18231f;--ink:#e6efec;--mute:#9bb0a9;--line:#2a3a35;--accent:#3fc2a9;--accent-ink:#06211c;--ok:#6fd99a;--okbg:#17372a;--warn:#f0b958;--warnbg:#3a2f14;--bad:#ff8a80;--badbg:#401c19;--pend:#a9b9d1;--pendbg:#222e3f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}[hidden]{display:none!important}details.clients{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}details.clients summary{cursor:pointer;font-weight:500}.msg{font-size:12px;color:var(--bad);margin-top:6px;min-height:1em}.rs{display:flex;gap:12px;align-items:center;padding:7px 0;border-top:1px solid var(--line);flex-wrap:wrap}.rs button{min-width:200px;text-align:start}.rs span{font-size:13px;color:var(--mute);flex:1;min-width:180px}.rs.danger button{color:var(--bad);border-color:var(--bad)}.tabs{display:flex;gap:6px;margin-top:14px}.tabs button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}#viewEmps{max-width:1200px;margin:auto;padding:16px 24px 40px}@media(max-width:860px){#viewEmps{padding:12px}}.ec{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;padding:14px}.ec h3{margin:0;font-size:16px}.ec .sub{color:var(--mute);font-size:13px}.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px 16px;margin:12px 0 8px}.kv div{font-size:14px;overflow-wrap:anywhere}.kv small{display:block;color:var(--mute);font-size:12px}.ec summary{cursor:pointer;font-weight:500;font-size:14px}.hl{margin:6px 0 0;padding:0;list-style:none}.hl li{padding:7px 0;border-top:1px solid var(--line);font-size:13px}.hl small{color:var(--mute)}.ev.collapsed .note-line,.ev.collapsed .prog,.ev.collapsed .task{display:none}.ev.collapsed .ev-h{border-bottom:0}.tog{min-width:28px;padding:2px 7px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,Arial,sans-serif}
+header{padding:22px 24px 6px;max-width:1200px;margin:auto}
+h1{margin:0;font-size:26px;font-weight:700}
+header p{margin:4px 0 0;color:var(--mute);max-width:75ch}
+main{max-width:1200px;margin:auto;padding:16px 24px 40px;display:grid;grid-template-columns:350px 1fr;gap:20px;align-items:start}
+@media(max-width:860px){main{grid-template-columns:1fr;padding:12px}header{padding:16px 12px 0}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.panel h2{font-size:16px;margin:0 0 10px}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 3px}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}textarea{resize:vertical}.note-line{padding:8px 14px;font-size:13px;color:var(--mute);border-bottom:1px solid var(--line);white-space:pre-wrap}.kv div:last-child{grid-column:1/-1;white-space:pre-wrap}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.chk{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14px;color:var(--ink)}.chk input{width:auto}
+button{font:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:500}
+button.small{padding:3px 9px;font-size:13px}
+button:disabled{opacity:.5;cursor:default}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{flex:1;border:0;border-radius:0;background:transparent}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+.hint{font-size:12px;color:var(--mute);margin-top:3px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface)}
+.stat b{display:block;font-size:24px;line-height:1.1}.stat span{font-size:13px;color:var(--mute)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.bar .grow{flex:1}
+.ev{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.ev-h{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
+.ev-h .who{font-weight:700;font-size:16px}.ev-h .meta{color:var(--mute);font-size:13px}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;font-weight:500}
+.t-onboard{background:var(--okbg);color:var(--ok)}.t-move{background:var(--warnbg);color:var(--warn)}.t-offboard{background:var(--badbg);color:var(--bad)}
+.urg{background:var(--bad);color:#fff}
+.prog{height:4px;background:var(--line)}.prog i{display:block;height:100%;background:var(--accent)}
+.task{display:grid;grid-template-columns:78px 1fr auto;gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line)}
+.task:last-child{border:0}
+.sys{font-size:12px;color:var(--mute)}
+.act{font-size:14px}.act small{display:block;color:var(--mute);font-size:12px;overflow-wrap:anywhere}
+.st{font-size:12px;padding:2px 9px;border-radius:99px;white-space:nowrap;font-weight:500}
+.s-done{background:var(--okbg);color:var(--ok)}.s-failed{background:var(--badbg);color:var(--bad)}.s-manual{background:var(--warnbg);color:var(--warn)}.s-pending{background:var(--pendbg);color:var(--pend)}.s-running{background:var(--accent);color:var(--accent-ink)}
+.tr{display:flex;gap:6px;align-items:center}
+details.log summary{cursor:pointer;font-weight:500;padding:6px 0}
+.logbox{max-height:260px;overflow:auto;font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px}
+.empty{padding:28px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:10px}
+.note{font-size:12px;color:var(--mute);margin-top:10px}
+@media(prefers-reduced-motion:no-preference){.prog i{transition:width .3s}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Employee lifecycle: onboarding, client moves and offboarding</h1>
+  <p>An HR event comes in. The engine breaks it into tasks based on role, client and device ownership, runs them against simulated Google, Slack and GitHub connectors, and shows what is done, open or failed.</p>
+  <nav class="tabs" aria-label="Views"><button data-view="auto" aria-pressed="true">Automation</button><button data-view="emps" aria-pressed="false">Employees <span id="empCount"></span></button><span id="store" class="note" style="align-self:center;margin:0 0 0 8px"></span></nav>
+</header>
+<main id="viewAuto">
+<section class="panel" aria-label="New event">
+  <h2>New HR event</h2>
+  <div class="seg" id="typeSeg" role="group" aria-label="Event type"></div>
+  <label for="name">Employee</label>
+  <input id="name" placeholder="Full name, e.g. Dana Levi">
+  <select id="empSel" hidden></select>
+  <div id="emailBox"><label for="email">Work email</label><input id="email" type="email" placeholder="Auto-filled with @develeap.com, editable"><div class="msg" id="emailErr"></div></div>
+  <div id="piBox"><div class="row"><div><label for="phone">Phone</label><input id="phone" type="tel" inputmode="tel" maxlength="20" placeholder="+972501234567"><div class="msg" id="phoneErr"></div></div><div><label for="loc">Location</label><input id="loc" placeholder="Tel Aviv / Remote"></div></div><label for="pemail">Personal email</label><input id="pemail" type="email"><div class="msg" id="pemailErr"></div><label for="notes">Notes</label><textarea id="notes" rows="3" maxlength="500" placeholder="Anything IT or the manager should know..."></textarea></div>
+  <label for="role">Role</label><select id="role"></select>
+  <div class="row"><div><label for="client">Client</label><select id="client"></select></div>
+  <div><label for="date">Date</label><input type="date" id="date"></div></div>
+  <label for="mgr">Manager</label><input id="mgr" value="Ron Cohen">
+  <div class="row"><div><label for="dev">Device owner</label><select id="dev"><option value="company">Company</option><option value="client">Client</option></select></div>
+  <div><label for="os">Operating system</label><select id="os"><option>Windows</option><option>Mac</option><option>Linux</option></select></div></div>
+  <label for="equip">Equipment needed</label><input id="equip" value="Laptop, headset">
+  <div id="swBox"><label for="sw">Extra software to install</label>
+  <input id="sw" list="swList" placeholder="e.g. figma, postman, wireshark">
+  <datalist id="swList"><option value="figma"><option value="postman"><option value="zoom"><option value="notion"><option value="wireshark"><option value="intellij-idea"></datalist>
+  <div class="hint">Comma-separated. Added on top of the base, role and client packages. Company devices only.</div></div>
+  <div class="chk" id="urgBox"><input type="checkbox" id="urg"><label for="urg" style="margin:0;color:var(--ink)">Urgent departure (block immediately)</label></div>
+  <div style="margin-top:14px" class="row"><button class="primary" id="add">Create event</button><button id="sample">Load samples</button></div>
+  <div class="msg" id="evErr"></div>
+  <details class="clients"><summary>Manage clients</summary>
+  <label for="clSel">Client</label><select id="clSel"></select>
+  <label for="clName">Name</label><input id="clName" placeholder="e.g. Umbrella Corp">
+  <label for="clGh">GitHub teams</label><input id="clGh" placeholder="comma-separated">
+  <label for="clSlack">Slack channels</label><input id="clSlack" placeholder="#cl-umbrella">
+  <label for="clGrp">Google groups / shared drives</label><input id="clGrp" placeholder="umbrella-shared-drive">
+  
+  <div class="row" style="margin-top:12px"><button class="primary" id="clSave">Save client</button><button id="clDel">Delete</button></div>
+  <div class="msg" id="clMsg"></div></details>
+  <p class="note">A client move computes the difference between the old and new client profile: it removes what the old client added and adds what the new one needs.</p>
+</section>
+
+<section aria-label="Events">
+  <div class="stats" id="stats"></div>
+  <div class="bar">
+    <button class="primary" id="runAll">Run all</button>
+    <button id="retryAll">Retry failed</button><button id="stopBtn" disabled>Stop</button>
+    <label class="chk" style="margin:0"><input type="checkbox" id="flaky" checked>Simulate random failures</label>
+    <button id="toggleAll">Collapse all</button><span class="grow"></span>
+    <button id="reset">Reset…</button>
+  </div>
+  <div class="panel" id="resetBox" hidden style="margin-bottom:14px"><h2>What do you want to reset?</h2>
+  <div class="rs"><button data-reset="tasks">Task statuses</button><span>Events stay. Every step goes back to not-run.</span></div>
+  <div class="rs"><button data-reset="log">Audit log</button><span>Clears the log only.</span></div>
+  <div class="rs"><button data-reset="events">Events and audit log</button><span>Keeps clients and employees.</span></div>
+  <div class="rs danger"><button data-reset="emps">Employees</button><span>Deletes the employee registry used by client moves and offboarding.</span></div>
+  <div class="rs danger"><button data-reset="clients">Clients to defaults</button><span>Deletes custom clients and restores the sample list.</span></div>
+  <div class="rs danger"><button data-reset="all">Everything</button><span>Events, employees, clients and log.</span></div>
+  <div class="note">Each option asks for a second click to confirm.</div></div>
+  <div id="events"></div>
+  <details class="log"><summary>Audit log</summary><div class="logbox" id="log"></div></details>
+</section>
+</main>
+<div id="viewEmps" hidden>
+  <div class="bar"><input id="eq" type="search" placeholder="Search name, email, client, equipment..." style="max-width:360px" aria-label="Search employees"><select id="ef" style="width:auto" aria-label="Status filter"><option value="active">Active</option><option value="left">Former</option><option value="all">All</option></select></div>
+  <div id="elist"></div>
+</div>
+
+<script>
+// ---------- Profiles (source of truth for access) ----------
+const ROLES={
+ dev:{n:'Developer',gh:['dev-team'],slack:['#dev'],grp:['eng@'],lic:['Google Workspace Business','GitHub Seat'],sw:['git','vscode','docker','node']},
+ devops:{n:'DevOps engineer',gh:['infra'],slack:['#devops'],grp:['ops@'],lic:['Google Workspace Business','GitHub Seat'],sw:['terraform','kubectl','docker']},
+ office:{n:'Office worker',gh:[],slack:['#general-office'],grp:['office@'],lic:['Google Workspace Business'],sw:['zoom','libreoffice','notion']},
+ support:{n:'Support agent',gh:[],slack:['#support'],grp:['support@'],lic:['Google Workspace Business'],sw:['zendesk-agent']}};
+const CLIENTS={
+ internal:{n:'Internal (bench)',gh:[],slack:[],grp:[],sw:[]},
+ acme:{n:'Acme',gh:['acme-repos'],slack:['#cl-acme'],grp:['acme-shared-drive'],sw:[]},
+ globex:{n:'Globex',gh:['globex-platform'],slack:['#cl-globex'],grp:['globex-shared-drive'],sw:[]},
+ initech:{n:'Initech',gh:['initech-apps'],slack:['#cl-initech'],grp:['initech-shared-drive'],sw:[]}};
+const BASE_SW=['chrome','slack','1password','company-vpn'];
+const PM={Windows:'winget install',Mac:'brew install',Linux:'apt install'};
+const RETENTION=30;
+
+// ---------- State ----------
+let S={events:[],emps:{},log:[],seq:1};
+try{const r=localStorage.getItem('lc2');if(r)S=JSON.parse(r)}catch(e){}
+let serverMode=false,st=null;
+const save=()=>{
+ if(!serverMode){try{localStorage.setItem('lc2',JSON.stringify(S))}catch(e){}return}
+ clearTimeout(st);st=setTimeout(async()=>{try{const r=await fetch('api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(S)});setBadge(r.ok?'ok':'err')}catch(e){setBadge('err')}},200)};
+function setBadge(s){const el=document.getElementById('store');if(el)el.textContent=serverMode?(s==='err'?'data.json: SAVE FAILED':'Storage: data.json'):'Storage: this browser only'}
+const DEF=JSON.stringify(CLIENTS);
+if(S.clients){for(const k in CLIENTS)delete CLIENTS[k];Object.assign(CLIENTS,S.clients)}
+S.clients=CLIENTS;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=id=>document.getElementById(id);
+const stamp=()=>new Date().toLocaleTimeString('en-GB');
+function audit(m){S.log.unshift(stamp()+'  '+m);S.log=S.log.slice(0,300)}
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+const today=()=>new Date().toISOString().slice(0,10);
+const parseSw=s=>[...new Set(String(s||'').split(/[,\s]+/).map(x=>x.trim().toLowerCase()).filter(Boolean))];
+const uniq=a=>[...new Set(a)];
+
+// ---------- Engine: event -> tasks ----------
+function T(sys,action,detail,opts={}){return{sys,action,detail:detail||'',status:opts.manual?'manual':'pending',manual:!!opts.manual,owner:opts.owner||'',due:opts.due||'',attempts:0}}
+const list=a=>a.join(', ')||'none';
+function plan(ev){
+ const r=ROLES[ev.role],c=CLIENTS[ev.client],t=[],mail=ev.email;
+ if(ev.type==='onboard'){
+  const grp=[...r.grp,...c.grp],sl=[...r.slack,...c.slack],gh=[...r.gh,...c.gh];
+  t.push(T('HR','Validate HR record','name, role, manager, start date, equipment'));
+  t.push(T('Google','Create user and groups',mail+' | '+list(grp)));
+  t.push(T('Slack','Invite and add to channels',list(sl)));
+  if(gh.length)t.push(T('GitHub','Invite to org and teams',list(gh)));
+  t.push(T('Licenses','Assign licenses',list(r.lic)));
+  if(ev.dev==='company'){
+   t.push(T('Device','Prepare device: '+ev.equip,'',{manual:true,owner:'IT',due:addDays(ev.date,-2)}));
+   const sw=uniq([...BASE_SW,...r.sw,...ev.extraSw]);
+   t.push(T('Device','Install software on '+ev.os,PM[ev.os]+' '+sw.join(' ')+(ev.extraSw.length?'  (extra: '+ev.extraSw.join(', ')+')':'')));
+  }else{t.push(T('Device','Coordinate access from client device','Client-owned device: arrange access and permissions with '+c.n+' IT'+(ev.extraSw.length?'. Requested software to ask them for: '+ev.extraSw.join(', '):''),{manual:true,owner:'IT',due:addDays(ev.date,-2)}));
+   t.push(T('Device','Install software on '+ev.os,PM[ev.os]+' company-vpn'))}
+  t.push(T('Notify','Notify the manager that we are ready for onboarding',ev.mgr));
+  t.push(T('Meeting','Onboarding meeting with '+ev.name,ev.date,{manual:true}));
+ }else if(ev.type==='move'){
+  const o=CLIENTS[ev.oldClient]||CLIENTS.internal;
+  const rm=k=>o[k].filter(x=>!c[k].includes(x)),ad=k=>c[k].filter(x=>!o[k].includes(x));
+  t.push(T('HR','Validate client move',o.n+' → '+c.n));
+  t.push(T('Google','Update groups','remove: '+list(rm('grp'))+' | add: '+list(ad('grp'))));
+  t.push(T('Slack','Update channels','remove: '+list(rm('slack'))+' | add: '+list(ad('slack'))));
+  t.push(T('GitHub','Update teams','remove: '+list(rm('gh'))+' | add: '+list(ad('gh'))));
+  if(ev.dev==='company'){
+   if(ev.extraSw.length)t.push(T('Device','Install software on '+ev.os,PM[ev.os]+' '+ev.extraSw.join(' ')));
+   
+  }else t.push(T('Device','Coordinate with clients','Clean up access on '+o.n+' device, connect to '+c.n,{manual:true,owner:'IT'}));
+  t.push(T('Notify','Tell manager about the move'));
+ }else{
+  t.push(T('Google','1. Block: suspend user, revoke sessions',ev.urgent?'immediate':'scheduled for '+ev.date));
+  t.push(T('Slack','1. Block: deactivate and revoke tokens'));
+  t.push(T('GitHub','1. Block: remove from org, revoke PAT / SSH keys'));
+  t.push(T('Google','2. Transfer: Drive and mail to manager',ev.mgr+' takes ownership of files'));
+  t.push(T('GitHub','2. Transfer: repos and open PRs',ev.mgr+' takes ownership of the repositories and open PRs'));
+  t.push(T('Google','3. Retain: archive mailbox',RETENTION+' days'));
+  t.push(T('Licenses','4. Release licenses','only after transfer and retention: '+list(r.lic)));
+  if(ev.dev==='company')t.push(T('Device','5. Collect device and wipe','inventory check, wipe, prepare for next hire',{manual:true,owner:'IT'}));
+  else t.push(T('Device','5. Ask '+c.n+' to revoke access','Device belongs to the client, no wipe on our side',{manual:true,owner:'IT'}));
+  t.push(T('Google','6. Scheduled deletion',addDays(ev.date,RETENTION)));
+  {const fin=T('HR','7. Mark employee as former','Moves '+ev.name+' to the former employees list');fin.fx='former';t.push(fin)}
+ }
+ return t;
+}
+const mkEmail=n=>n.trim().toLowerCase().replace(/\s+/g,'.')+'@develeap.com';
+
+function createEvent(type,f){
+ const ev={id:S.seq++,type,name:f.name,email:f.email,role:f.role,client:f.client,date:f.date,mgr:f.mgr,dev:f.dev,os:f.os,equip:f.equip,urgent:f.urgent,extraSw:parseSw(f.sw),notes:f.notes||''};
+ if(type==='move')ev.oldClient=S.emps[f.email]?.client;
+ ev.tasks=plan(ev);
+ S.events.unshift(ev);
+ if(type==='offboard'){offboardEmp(f,ev)}
+ else upsertEmp(type,f,ev);
+ audit('Created event #'+ev.id+' ('+type+') for '+f.name+' with '+ev.tasks.length+' tasks');
+ save();
+}
+
+// ---------- Connectors (simulated) ----------
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function connector(ev,t){
+ await sleep(250+Math.random()*350);
+ if($('flaky').checked&&t.attempts===1&&Math.random()<0.18)throw new Error(t.sys+' API returned 503');
+}
+async function runTask(ev,t){
+ t.status='running';t.attempts++;render();
+ try{await connector(ev,t);t.status='done';t.doneBy='auto';t.err='';applyFx(ev,t,true);audit('#'+ev.id+' ['+t.sys+'] '+t.action+': done (idempotent, attempt '+t.attempts+')')}
+ catch(e){t.status='failed';t.err=e.message;audit('#'+ev.id+' ['+t.sys+'] '+t.action+': failed: '+e.message)}
+ save();render();return t.status==='done';
+}
+let stopReq=false,runs=0;
+function setStop(){const b=document.getElementById('stopBtn');if(!b)return;b.disabled=runs===0||stopReq;b.textContent=runs>0&&stopReq?'Stopping…':'Stop'}
+function runStart(){if(runs===0)stopReq=false;runs++;setStop()}
+function runEnd(){runs--;setStop()}
+async function runEvent(ev){runStart();try{await runEventInner(ev)}finally{runEnd()}}
+async function runEventInner(ev){
+ for(const t of ev.tasks){
+  if(t.status==='done'||t.manual&&t.status!=='pending')continue;
+  if(stopReq)return; // stop requested: do not start the next step
+  if(t.status==='failed'&&t.attempts>=3)return;
+  if(!await runTask(ev,t))return; // sequential: a failure stops later steps (e.g. block before release)
+ }
+}
+async function runAll(){runStart();$('runAll').disabled=true;try{for(const ev of [...S.events].sort((a,b)=>a.id-b.id)){if(stopReq)break;await runEvent(ev)}}finally{$('runAll').disabled=false;runEnd();render()}}
+async function retryAll(){
+ runStart();$('retryAll').disabled=true;
+ for(const ev of [...S.events].sort((a,b)=>a.id-b.id)){
+  const first=ev.tasks.findIndex(t=>t.status==='failed');
+  if(stopReq)break;if(first<0)continue; // events without failures are left untouched
+  for(let i=first;i<ev.tasks.length;i++){ // retry from the first failed step and continue to the next ones
+   const t=ev.tasks[i];
+   if(t.status==='done'||t.manual)continue;if(stopReq)break;
+   if(t.status==='failed')t.attempts=Math.min(t.attempts,1);
+   if(!await runTask(ev,t))break; // stop this event if a step fails again
+  }
+ }
+ $('retryAll').disabled=false;runEnd();render();
+}
+
+// ---------- UI ----------
+let type='onboard';
+const TYPES={onboard:'Onboarding',move:'Client move',offboard:'Offboarding'};
+const opts=(o,sel)=>Object.entries(o).map(([k,v])=>`<option value="${k}"${k===sel?' selected':''}>${esc(v.n)}</option>`).join('');
+function drawForm(){
+ $('typeSeg').innerHTML=Object.entries(TYPES).map(([k,v])=>`<button data-t="${k}" aria-pressed="${k===type}">${v}</button>`).join('');
+ const act=Object.values(S.emps).filter(e=>e.active),sel=$('empSel'),useSel=type!=='onboard';
+ $('name').hidden=useSel;sel.hidden=!useSel;
+ sel.innerHTML=act.length?act.map(e=>`<option value="${esc(e.email)}">${esc(e.name)} (${esc((CLIENTS[e.client]||{n:e.client}).n)})</option>`).join(''):'<option value="">No active employees. Create an onboarding first.</option>';
+ $('urgBox').hidden=type!=='offboard';$('swBox').hidden=type==='offboard';$('emailBox').hidden=type!=='onboard';$('piBox').hidden=type!=='onboard';prefill();
+}
+function stats(){
+ const c={done:0,pending:0,manual:0,failed:0};
+ S.events.forEach(e=>e.tasks.forEach(t=>{c[t.status==='running'?'pending':t.status]++}));
+ const L={done:['Done','var(--ok)'],pending:['Pending','var(--pend)'],manual:['Manual open','var(--warn)'],failed:['Failed','var(--bad)']};
+ $('stats').innerHTML=Object.keys(L).map(k=>`<div class="stat"><b style="color:${L[k][1]}">${c[k]}</b><span>${L[k][0]}</span></div>`).join('');
+}
+const SL={done:'Done',pending:'Pending',failed:'Failed',manual:'Manual',running:'Running…'};
+function render(){
+ stats();
+ $('events').innerHTML=S.events.length?S.events.map(ev=>{
+  const done=ev.tasks.filter(t=>t.status==='done').length,fails=ev.tasks.filter(t=>t.status==='failed').length,pct=Math.round(done/ev.tasks.length*100);
+  return `<article class="ev${ev.collapsed?' collapsed':''}"><div class="ev-h"><button class="small tog" data-tog="${ev.id}" aria-expanded="${!ev.collapsed}" aria-label="${ev.collapsed?'Expand':'Collapse'} ${esc(ev.name)}">${ev.collapsed?'▸':'▾'}</button><span class="tag t-${ev.type}">${TYPES[ev.type]}</span>${ev.urgent?'<span class="tag urg">Urgent</span>':''}
+  <span class="who">${esc(ev.name)}</span><span class="meta">${esc(ROLES[ev.role].n)} · ${esc((CLIENTS[ev.client]||{n:ev.client}).n)} · ${esc(ev.date)} · ${esc(ev.email)} · ${ev.dev==='company'?'company device ('+esc(ev.os)+')':'client device'}</span>
+  ${ev.collapsed?`<span class="meta">${done}/${ev.tasks.length} done${fails?' · <b style="color:var(--bad)">'+fails+' failed</b>':''}</span>`:''}<span style="margin-inline-start:auto"><button class="small" data-run="${ev.id}">Run remaining</button></span></div>${ev.notes?`<div class="note-line">Note: ${esc(ev.notes)}</div>`:''}
+  <div class="prog" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+  ${ev.tasks.map((t,i)=>`<div class="task"><span class="sys">${esc(t.sys)}</span>
+   <div class="act">${esc(t.action)}<small>${esc(t.detail)}${t.owner?' · owner: '+esc(t.owner):''}${t.due?' · due '+esc(t.due):''}${t.err&&t.status==='failed'?' · '+esc(t.err):''}${t.status==='done'&&t.doneBy==='manual'?' · completed manually':''}</small></div>
+   <div class="tr"><span class="st s-${t.status}">${SL[t.status]}</span>
+   ${t.status==='done'?`<button class="small" data-undo="${ev.id}:${i}">Undo</button>`:`${t.manual?'':`<button class="small" data-step="${ev.id}:${i}"${t.status==='running'?' disabled':''}>${t.status==='failed'?'Retry':'Run'}</button>`}<button class="small" data-done="${ev.id}:${i}"${t.status==='running'?' disabled':''}>Mark done</button>`}
+   </div></div>`).join('')}</article>`}).join('')
+ :'<div class="empty">No events yet. Create one from the form, or click "Load samples".</div>';
+ $('log').innerHTML=S.log.map(esc).join('<br>')||'The log is empty';$('toggleAll').textContent=S.events.length&&S.events.every(e=>e.collapsed)?'Expand all':'Collapse all';renderEmps();
+}
+const ev$=id=>S.events.find(e=>e.id==+id);
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.view){const v=b.dataset.view;$('viewAuto').hidden=v!=='auto';$('viewEmps').hidden=v!=='emps';document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.view===v));renderEmps();return}
+ if(b.dataset.tog){const x=ev$(b.dataset.tog);if(x){x.collapsed=!x.collapsed;save();render()}return}
+ if(b.dataset.eedit){editing=b.dataset.eedit;renderEmps(true);return}
+ if(b.dataset.ecancel){editing=null;renderEmps(true);return}
+ if(b.dataset.esave){saveEmp(b.dataset.esave);return}
+ if(b.dataset.t){type=b.dataset.t;drawForm();return}
+ if(b.dataset.run){await runEvent(ev$(b.dataset.run));return}
+ if(b.dataset.done){const[i,k]=b.dataset.done.split(':');const t=ev$(i).tasks[k];t.status='done';t.doneBy='manual';t.err='';applyFx(ev$(i),t,true);audit('#'+i+' ['+t.sys+'] '+t.action+': marked done manually');save();render();return}
+ if(b.dataset.step){const[i,k]=b.dataset.step.split(':');const t=ev$(i).tasks[k];if(t.status==='failed')t.attempts=Math.min(t.attempts,1);await runTask(ev$(i),t);return}
+ if(b.dataset.undo){const[i,k]=b.dataset.undo.split(':');const t=ev$(i).tasks[k];
+  if(t.doneBy==='auto'){t.status='running';render();await sleep(300);audit('#'+i+' ['+t.sys+'] '+t.action+': rolled back')}else audit('#'+i+' ['+t.sys+'] '+t.action+': undone');
+  applyFx(ev$(i),t,false);t.status=t.manual?'manual':'pending';t.attempts=0;t.err='';t.doneBy='';save();render();return}
+ if(b.dataset.retry){const[i,k]=b.dataset.retry.split(':');const t=ev$(i).tasks[k];t.status='pending';t.attempts=Math.min(t.attempts,1);await runEvent(ev$(i));return}
+});
+$('add').onclick=()=>{
+ let name,email;
+ if(type==='onboard'){name=$('name').value.trim();if(!name){$('name').focus();return}
+  email=$('email').value.trim().toLowerCase()||mkEmail(name);if(!email.includes('@'))email+='@develeap.com';
+  if(!validEmail(email)){$('emailErr').textContent='Enter a valid email address.';$('email').focus();return}
+  if(S.emps[email]&&S.emps[email].active){$('emailErr').textContent='An active employee already uses this email.';$('email').focus();return}
+  $('emailErr').textContent='';
+  const ph=$('phone').value.trim(),pe=$('pemail').value.trim().toLowerCase();$('phoneErr').textContent='';$('pemailErr').textContent='';
+  if(ph&&!validPhone(ph)){$('phoneErr').textContent='Use digits, a leading + and balanced parentheses (at least 7 digits).';$('phone').focus();return}
+  if(pe&&!validEmail(pe)){$('pemailErr').textContent='Enter a valid email address.';$('pemail').focus();return}}
+ else{email=$('empSel').value;if(!email)return;name=S.emps[email].name;
+  if(type==='offboard'&&S.events.some(x=>x.type==='offboard'&&x.email===email&&x.tasks[x.tasks.length-1].status!=='done')){$('evErr').textContent=name+' already has an open offboarding event.';return}}
+ $('evErr').textContent='';
+ createEvent(type,{name,email,role:$('role').value,client:$('client').value,date:$('date').value||today(),mgr:$('mgr').value,dev:$('dev').value,os:$('os').value,equip:$('equip').value,sw:$('sw').value,phone:$('phone').value.trim(),pemail:$('pemail').value.trim(),loc:$('loc').value.trim(),notes:$('notes').value.trim(),urgent:type==='offboard'&&$('urg').checked});
+ $('name').value='';$('sw').value='';$('email').value='';$('email').dataset.edited='';$('phone').value='';$('pemail').value='';$('loc').value='';$('notes').value='';render();drawForm();
+ const cards=document.querySelectorAll('#events .ev');if(cards.length)cards[0].scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+$('sample').onclick=()=>{
+ const d=today(),m='Ron Cohen';
+ const dana='dana.levi@develeap.com',yoav='yoav.mizrahi@develeap.com',noa='noa.barak@develeap.com';
+ createEvent('onboard',{name:'Dana Levi',email:dana,role:'dev',client:'acme',phone:'+972501234567',pemail:'dana.levi@gmail.com',loc:'Tel Aviv office',notes:'Needs staging cluster access before day one.',date:addDays(d,3),mgr:m,dev:'company',os:'Mac',equip:'MacBook Pro',sw:'figma, postman',urgent:false});
+ createEvent('onboard',{name:'Yoav Mizrahi',email:yoav,role:'devops',client:'globex',phone:'+972527654321',pemail:'yoav.m@outlook.com',loc:'Remote',notes:'Fully remote. Globex ships the client laptop.',date:addDays(d,5),mgr:m,dev:'client',os:'Windows',equip:'none',sw:'',urgent:false});
+ createEvent('onboard',{name:'Noa Barak',email:noa,phone:'+972542223344',pemail:'noa.barak@gmail.com',loc:'Haifa office',role:'office',client:'internal',date:addDays(d,7),mgr:m,dev:'company',os:'Windows',equip:'Laptop',sw:'zoom',urgent:false});
+ createEvent('move',{name:'Dana Levi',email:dana,role:'dev',client:'initech',date:addDays(d,10),mgr:m,dev:'company',os:'Mac',equip:'',sw:'',urgent:false});
+ createEvent('offboard',{name:'Yoav Mizrahi',email:yoav,role:'devops',client:'globex',date:d,mgr:m,dev:'client',os:'Windows',equip:'',sw:'',urgent:true});S.events.splice(0,5,...S.events.slice(0,5).reverse());save();
+ render();drawForm();
+};
+$('runAll').onclick=runAll;$('retryAll').onclick=retryAll;
+$('toggleAll').onclick=()=>{const c=!(S.events.length&&S.events.every(e=>e.collapsed));S.events.forEach(e=>e.collapsed=c);save();render()};
+$('stopBtn').onclick=()=>{if(runs>0&&!stopReq){stopReq=true;audit('Stop requested: the current step will finish, no further steps will start');save();render();setStop()}};
+$('reset').onclick=()=>{$('resetBox').hidden=!$('resetBox').hidden};
+let armed=null;
+$('resetBox').addEventListener('click',e=>{
+ const b=e.target.closest('button[data-reset]');if(!b)return;
+ if(armed!==b){if(armed)armed.textContent=armed.dataset.l;armed=b;b.dataset.l=b.dataset.l||b.textContent;b.textContent='Click again to confirm';setTimeout(()=>{if(armed===b){b.textContent=b.dataset.l;armed=null}},4000);return}
+ const w=b.dataset.reset;b.textContent=b.dataset.l;armed=null;
+ const defClients=()=>{for(const k in CLIENTS)delete CLIENTS[k];Object.assign(CLIENTS,JSON.parse(DEF))};
+ if(w==='tasks')S.events.forEach(ev=>ev.tasks.forEach(t=>{if(t.status==='done')applyFx(ev,t,false);t.status=t.manual?'manual':'pending';t.attempts=0;t.err='';t.doneBy=''}));
+ if(w==='log')S.log=[];
+ if(w==='events'){S.events=[];S.log=[]}
+ if(w==='emps')S.emps={};
+ if(w==='clients')defClients();
+ if(w==='all'){defClients();S={events:[],emps:{},log:[],seq:1,clients:CLIENTS}}
+ if(w!=='log')audit('Reset: '+w);
+ save();fillClients();drawClients('');render();drawForm();
+});
+$('role').innerHTML=opts(ROLES);$('client').innerHTML=opts(CLIENTS,'acme');$('date').value=today();
+// ---- client manager ----
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const csv=a=>(a||[]).join(', ');
+function fillClients(){const keep=$('client').value;$('client').innerHTML=opts(CLIENTS,CLIENTS[keep]?keep:Object.keys(CLIENTS)[0])}
+function drawClients(sel){
+ const c=CLIENTS[sel]||{n:'',gh:[],slack:[],grp:[],sw:[]};
+ $('clSel').innerHTML='<option value="">+ New client</option>'+Object.entries(CLIENTS).map(([k,v])=>`<option value="${esc(k)}"${k===sel?' selected':''}>${esc(v.n)}</option>`).join('');
+ $('clName').value=c.n;$('clGh').value=csv(c.gh);$('clSlack').value=csv(c.slack);$('clGrp').value=csv(c.grp);
+ $('clDel').disabled=!sel||sel==='internal';$('clMsg').textContent='';
+}
+$('clSel').onchange=()=>drawClients($('clSel').value);
+$('clSave').onclick=()=>{
+ const n=$('clName').value.trim();if(!n){$('clMsg').textContent='Enter a client name.';return}
+ const cur=$('clSel').value,k=cur||slug(n);
+ if(!k||(!cur&&CLIENTS[k])){$('clMsg').textContent='A client with this name already exists, or the name has no letters or digits.';return}
+ CLIENTS[k]={n,gh:parseSw($('clGh').value),slack:parseSw($('clSlack').value),grp:parseSw($('clGrp').value),sw:[]};
+ audit((cur?'Client updated: ':'Client added: ')+n);save();fillClients();drawClients(k);render();$('clMsg').style.color='var(--ok)';$('clMsg').textContent='Saved.';
+};
+$('clDel').onclick=()=>{
+ const k=$('clSel').value;if(!k)return;
+ const used=S.events.some(e=>e.client===k||e.oldClient===k)||Object.values(S.emps).some(e=>e.client===k);
+ $('clMsg').style.color='var(--bad)';
+ if(used){$('clMsg').textContent='Used by existing events or employees, so it cannot be deleted.';return}
+ audit('Client deleted: '+CLIENTS[k].n);delete CLIENTS[k];save();fillClients();drawClients('');
+};
+$('name').addEventListener('input',()=>{if(!$('email').dataset.edited){const v=$('name').value.trim();$('email').value=v?mkEmail(v):''}});
+$('email').addEventListener('input',()=>{$('email').dataset.edited=$('email').value?'1':''});
+$('email').addEventListener('blur',()=>{const v=$('email').value.trim();if(v&&!v.includes('@'))$('email').value=v+'@develeap.com'});
+$('empSel').onchange=()=>prefill();
+const validEmail=e=>e.length<=254&&/^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i.test(e);
+const balanced=s=>{let d=0;for(const c of s){if(c==='(')d++;else if(c===')'&&--d<0)return false}return d===0};
+const validPhone=p=>/^\+?[0-9()]+$/.test(p)&&(p.match(/\d/g)||[]).length>=7&&balanced(p);
+$('phone').addEventListener('input',()=>{const el=$('phone');const v=el.value.replace(/[^0-9+()]/g,'').replace(/(?!^)\+/g,'');if(v!==el.value)el.value=v});
+// ---- employees ----
+const cn=k=>(CLIENTS[k]||{n:k}).n,rn=k=>(ROLES[k]||{n:k}).n;
+function hist(e,date,kind,text){(e.history=e.history||[]).unshift({at:new Date().toISOString().slice(0,16).replace('T',' '),date,kind,text})}
+function prefill(){if(type==='onboard')return;const e=S.emps[$('empSel').value];if(!e)return;$('role').value=e.role;if(CLIENTS[e.client])$('client').value=e.client;$('mgr').value=e.mgr||$('mgr').value;$('dev').value=e.dev||'company';$('os').value=e.os||'Windows';$('equip').value=e.equip||''}
+function upsertEmp(type,f,ev){
+ if(type==='onboard'){
+  const e={name:f.name,email:f.email,role:f.role,client:f.client,dev:f.dev,os:f.os,equip:f.equip,mgr:f.mgr,start:f.date,phone:f.phone||'',pemail:f.pemail||'',loc:f.loc||'',notes:f.notes||'',active:true,history:[]};
+  hist(e,f.date,'Onboarding','Joined as '+rn(f.role)+' at '+cn(f.client)+'. Device: '+(f.dev==='company'?'company ('+f.os+')':'client-owned')+'. Equipment: '+(f.equip||'none')+'. Manager: '+f.mgr+(ev.extraSw.length?'. Extra software: '+ev.extraSw.join(', '):'')+'.');
+  S.emps[f.email]=e;return}
+ const p=S.emps[f.email];if(!p)return;
+ const ch=[];
+ if(p.client!==f.client)ch.push('client: '+cn(p.client)+' → '+cn(f.client));
+ if(p.role!==f.role)ch.push('role: '+rn(p.role)+' → '+rn(f.role));
+ if((p.mgr||'')!==f.mgr)ch.push('manager: '+(p.mgr||'none')+' → '+f.mgr);
+ if(p.dev!==f.dev||p.os!==f.os)ch.push('device: '+(p.dev==='company'?'company ('+p.os+')':'client-owned')+' → '+(f.dev==='company'?'company ('+f.os+')':'client-owned'));
+ if(f.equip&&(p.equip||'')!==f.equip)ch.push('equipment: '+(p.equip||'none')+' → '+f.equip);
+ if(ev.extraSw.length)ch.push('new software: '+ev.extraSw.join(', '));
+ Object.assign(p,{client:f.client,role:f.role,mgr:f.mgr,dev:f.dev,os:f.os});if(f.equip)p.equip=f.equip;
+ hist(p,f.date,'Client move',(ch.join('; ')||'No profile changes')+'.');
+}
+function offboardEmp(f,ev){
+ const p=S.emps[f.email];if(!p)return;
+ 
+ hist(p,f.date,'Offboarding scheduled',(ev.urgent?'URGENT: access blocked immediately. ':'')+'Departure date '+f.date+'. Data transferred to '+f.mgr+'; mailbox retained '+RETENTION+' days; deletion scheduled '+addDays(f.date,RETENTION)+'.');
+}
+function applyFx(ev,t,on){
+ if(t.fx!=='former')return;
+ const p=S.emps[ev.email];if(!p)return;
+ if(on){p.active=false;p.left=ev.date;hist(p,today(),'Offboarding completed','Marked as a former employee (departure date '+ev.date+').')}
+ else{p.active=true;delete p.left;hist(p,today(),'Offboarding reverted','Marked as active again because the step was undone.')}
+}
+const openH=new Set();
+document.addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.e){d.open?openH.add(d.dataset.e):openH.delete(d.dataset.e)}},true);
+let editing=null;
+function renderEmps(force){
+ $('empCount').textContent='('+Object.values(S.emps).filter(e=>e.active).length+')';
+ if($('viewEmps').hidden||(editing&&!force))return;
+ const q=$('eq').value.trim().toLowerCase(),f=$('ef').value;
+ const L=Object.values(S.emps).filter(e=>(f==='all'||(f==='active')===e.active)&&(!q||[e.name,e.email,e.phone,e.loc,e.notes,e.equip,cn(e.client)].join(' ').toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name));
+ $('elist').innerHTML=L.length?L.map(e=>`<article class="ec"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3>${esc(e.name)}</h3><span class="tag ${e.active?'t-onboard':'t-offboard'}">${e.active?'Active':'Left '+esc(e.left||'')}</span><span class="sub">${esc(e.email)}</span></div>
+  ${editing===e.email?editForm(e):`<div class="kv">${[['Role',rn(e.role)],['Works at',cn(e.client)],['Location',e.loc||'-'],['Manager',e.mgr||'-'],['Start date',e.start||'-'],['Device',e.dev==='company'?'Company ('+(e.os||'?')+')':'Client-owned'],['Equipment',e.equip||'-'],['Phone',e.phone||'-'],['Personal email',e.pemail||'-'],['Notes',e.notes||'-']].map(([k,v])=>`<div><small>${k}</small>${esc(v)}</div>`).join('')}</div><button class="small" data-eedit="${esc(e.email)}">Edit details</button>`}
+  <details data-e="${esc(e.email)}"${openH.has(e.email)?' open':''}><summary>Change history (${(e.history||[]).length})</summary><ul class="hl">${(e.history||[]).map(h=>`<li><b>${esc(h.kind)}</b> · ${esc(h.date)} <small>(recorded ${esc(h.at)})</small><br>${esc(h.text)}</li>`).join('')||'<li>No history recorded.</li>'}</ul></details></article>`).join(''):'<div class="empty">No employees match. Create an onboarding event or change the filter.</div>';
+}
+$('eq').oninput=()=>renderEmps();$('ef').onchange=()=>renderEmps();
+function editForm(e){
+ const o=(obj,sel)=>Object.entries(obj).map(([k,v])=>`<option value="${esc(k)}"${k===sel?' selected':''}>${esc(v.n)}</option>`).join('');
+ return `<div class="kv" style="margin-bottom:4px">
+ <div><small>Role</small><select id="ed-role">${o(ROLES,e.role)}</select></div>
+ <div><small>Location</small><input id="ed-loc" value="${esc(e.loc||'')}"></div>
+ <div><small>Manager</small><input id="ed-mgr" value="${esc(e.mgr||'')}"></div>
+ <div><small>Device owner</small><select id="ed-dev"><option value="company"${e.dev==='company'?' selected':''}>Company</option><option value="client"${e.dev==='client'?' selected':''}>Client</option></select></div>
+ <div><small>Operating system</small><select id="ed-os">${['Windows','Mac','Linux'].map(x=>`<option${x===e.os?' selected':''}>${x}</option>`).join('')}</select></div>
+ <div><small>Equipment</small><input id="ed-equip" value="${esc(e.equip||'')}"></div>
+ <div><small>Phone</small><input id="ed-phone" type="tel" inputmode="tel" maxlength="20" value="${esc(e.phone||'')}"></div>
+ <div><small>Personal email</small><input id="ed-pemail" type="email" value="${esc(e.pemail||'')}"></div>
+ <div><small>Notes</small><textarea id="ed-notes" rows="3" maxlength="500">${esc(e.notes||'')}</textarea></div></div>
+ <div class="msg" id="ed-err"></div>
+ <div class="row" style="max-width:260px;margin-bottom:8px"><button class="primary" data-esave="${esc(e.email)}">Save</button><button data-ecancel="1">Cancel</button></div>`;
+}
+function saveEmp(email){
+ const e=S.emps[email];if(!e)return;
+ const g=id=>document.getElementById(id).value.trim(),err=document.getElementById('ed-err');
+ const v={role:g('ed-role'),loc:g('ed-loc'),mgr:g('ed-mgr'),dev:g('ed-dev'),os:g('ed-os'),equip:g('ed-equip'),phone:g('ed-phone'),pemail:g('ed-pemail').toLowerCase(),notes:g('ed-notes')};
+ if(!v.mgr){err.textContent='Manager cannot be empty.';return}
+ if(v.phone&&!validPhone(v.phone)){err.textContent='Phone: digits, a leading + and balanced parentheses (at least 7 digits).';return}
+ if(v.pemail&&!validEmail(v.pemail)){err.textContent='Personal email is not a valid address.';return}
+ const L={role:'role',loc:'location',mgr:'manager',dev:'device owner',os:'OS',equip:'equipment',phone:'phone',pemail:'personal email'};
+ const show=(k,x)=>k==='role'?rn(x):k==='dev'?(x==='company'?'company':'client-owned'):(x||'none');
+ const ch=Object.keys(v).filter(k=>(e[k]||'')!==v[k]).map(k=>k==='notes'?'notes updated':L[k]+': '+show(k,e[k])+' → '+show(k,v[k]));
+ if(ch.length){Object.assign(e,v);hist(e,today(),'Details updated',ch.join('; ')+'.');audit('Employee updated: '+e.name+' ('+ch.length+' change'+(ch.length>1?'s':'')+')');save()}
+ editing=null;renderEmps(true);render();
+}
+document.addEventListener('input',e=>{if(e.target.id==='ed-phone'){const el=e.target,v=el.value.replace(/[^0-9+()]/g,'').replace(/(?!^)\+/g,'');if(v!==el.value)el.value=v}});
+drawClients('');
+(async()=>{
+ try{const r=await fetch('api/data',{cache:'no-store'});
+  if(r.ok){const d=await r.json();serverMode=true;
+   for(const k in CLIENTS)delete CLIENTS[k];
+   if(d&&Array.isArray(d.events)){S=d;Object.assign(CLIENTS,d.clients||JSON.parse(DEF))}
+   else{Object.assign(CLIENTS,JSON.parse(DEF));S={events:[],emps:{},log:[],seq:1}}
+   S.clients=CLIENTS;if(!d)save();fillClients();drawClients('')}}
+ catch(e){serverMode=false}
+ setBadge();drawForm();render();
+})();
+</script>
+</body>
+</html>
